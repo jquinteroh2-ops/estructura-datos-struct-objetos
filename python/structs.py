@@ -77,8 +77,12 @@ def imprimir_estudiante(posicion: int, nombre: str, edad: int, promedio: float) 
     print(f"    [{posicion}] {nombre:<14} | edad: {edad:>2} | promedio: {promedio:.1f}")
 
 
-def recorrido(estudiantes: list[EstudianteStruct], registros: list[EstudianteRecord]) -> None:
-    print("\n3. Recorrido del arreglo")
+def recorrido(
+    estudiantes: list[EstudianteStruct],
+    registros: list[EstudianteRecord],
+    titulo: str = "3. Recorrido del arreglo",
+) -> None:
+    print(f"\n{titulo}")
     print("  a) Structs, por índice y accediendo a cada campo por su nombre:")
     for i in range(len(estudiantes)):
         estudiante = estudiantes[i]
@@ -87,7 +91,7 @@ def recorrido(estudiantes: list[EstudianteStruct], registros: list[EstudianteRec
     print("  b) Records, desempaquetando los campos (un NamedTuple también es una tupla):")
     for i, (nombre, edad, promedio) in enumerate(registros):
         imprimir_estudiante(i, nombre, edad, promedio)
-    print(f"     Acceso por posición: registros[0][0] = {registros[0][0]!r}")
+    print(f"    Acceso por posición: registros[0][0] = {registros[0][0]!r}")
 
     suma = 0.0
     for estudiante in estudiantes:
@@ -95,11 +99,44 @@ def recorrido(estudiantes: list[EstudianteStruct], registros: list[EstudianteRec
     print(f"  Promedio del grupo: {suma / len(estudiantes):.2f}")
 
 
+# 4. Modificación
+def buscar_por_nombre(arreglo: list, nombre: str) -> int:
+    """Búsqueda lineal: devuelve la posición del estudiante o -1 si no está."""
+    for i in range(len(arreglo)):
+        if arreglo[i].nombre == nombre:
+            return i
+    return -1
+
+
+def modificacion(estudiantes: list[EstudianteStruct], registros: list[EstudianteRecord]) -> None:
+    nombre, nuevo_promedio = "Luis Pérez", 4.1
+    print(f"\n4. Modificación (cambiar el promedio de {nombre} a {nuevo_promedio})")
+
+    print("  a) Struct (@dataclass, mutable): se asigna el campo directamente")
+    i = buscar_por_nombre(estudiantes, nombre)
+    print(f"    Antes:   {estudiantes[i]}")
+    estudiantes[i].promedio = nuevo_promedio
+    print(f"    Después: {estudiantes[i]}")
+
+    print("  b) Record (NamedTuple, inmutable): asignar el campo produce un error...")
+    j = buscar_por_nombre(registros, nombre)
+    try:
+        registros[j].promedio = nuevo_promedio
+    except AttributeError as error:
+        print(f"    AttributeError: {error}")
+    print("    ...así que se crea un record NUEVO con _replace() y se guarda en su posición")
+    print(f"    Antes:   {registros[j]}")
+    registros[j] = registros[j]._replace(promedio=nuevo_promedio)
+    print(f"    Después: {registros[j]}")
+
+
 def main() -> None:
     print("=== STRUCT / RECORD EN PYTHON ===")
     declaracion()
     estudiantes, registros = inicializacion()
     recorrido(estudiantes, registros)
+    modificacion(estudiantes, registros)
+    recorrido(estudiantes, registros, "Arreglos después de la modificación")
 
 
 if __name__ == "__main__":
