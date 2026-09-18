@@ -43,3 +43,10 @@ python python/comparativa.py     # el mismo Estudiante como struct, record y obj
 node js/comparativa.js           # el mismo Estudiante como struct, record y objeto en JavaScript
 node js/tipado-estatico.ts       # ejemplo de tipado estático con TypeScript (Node.js 22.18 o superior)
 ```
+
+### Inventario adaptado (actividad práctica)
+
+```bash
+python inventario-adaptado/main.py --demo    # demostración automática, sin escribir nada
+python inventario-adaptado/main.py           # menú interactivo con datos de ejemplo
+```
