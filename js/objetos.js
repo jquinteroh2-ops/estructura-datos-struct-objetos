@@ -14,17 +14,34 @@
 
 // 1. Declaración
 class Estudiante {
-  /** Campo privado: solo se lee con getPromedio(). */
-  #promedio;
+  static PROMEDIO_MINIMO = 0.0;
+  static PROMEDIO_MAXIMO = 5.0;
+
+  /** Campo privado: solo se lee con getPromedio() y solo se cambia con setPromedio(). */
+  #promedio = 0.0;
 
   constructor(nombre, edad, promedio) {
     this.nombre = nombre;
     this.edad = edad;
-    this.#promedio = promedio;
+    this.setPromedio(promedio); // el constructor reutiliza la misma validación
   }
 
   getPromedio() {
     return this.#promedio;
+  }
+
+  // 4. Modificación
+  setPromedio(nuevoPromedio) {
+    // typeof evita que JS convierta textos como '4.5' a número al comparar.
+    if (typeof nuevoPromedio !== 'number'
+        || nuevoPromedio < Estudiante.PROMEDIO_MINIMO
+        || nuevoPromedio > Estudiante.PROMEDIO_MAXIMO) {
+      throw new RangeError(
+        `promedio inválido (${nuevoPromedio}): debe estar entre `
+        + `${Estudiante.PROMEDIO_MINIMO.toFixed(1)} y ${Estudiante.PROMEDIO_MAXIMO.toFixed(1)}`,
+      );
+    }
+    this.#promedio = nuevoPromedio;
   }
 
   mostrarInfo() {
@@ -66,11 +83,46 @@ function recorrido(estudiantes, titulo = '3. Recorrido: mostrarInfo() de cada ob
   }
 }
 
+// 4. Modificación
+/** Búsqueda lineal: devuelve la posición del estudiante o -1 si no está. */
+function buscarPorNombre(estudiantes, nombre) {
+  for (let i = 0; i < estudiantes.length; i++) {
+    if (estudiantes[i].nombre === nombre) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function modificacion(estudiantes) {
+  const nombre = 'Luis Pérez';
+  const nuevoPromedio = 4.1;
+  console.log(`\n4. Modificación con setPromedio() (promedio de ${nombre} a ${nuevoPromedio})`);
+  const luis = estudiantes[buscarPorNombre(estudiantes, nombre)];
+  console.log(`  Antes:   getPromedio() = ${luis.getPromedio()}`);
+  luis.setPromedio(nuevoPromedio);
+  console.log(`  Después: getPromedio() = ${luis.getPromedio()}`);
+
+  console.log('  a) El método valida el dato: setPromedio(7.5) se rechaza');
+  try {
+    luis.setPromedio(7.5);
+  } catch (error) {
+    console.log(`    ${error.name}: ${error.message}`);
+  }
+  console.log(`    El promedio sigue siendo ${luis.getPromedio()}`);
+
+  console.log('  b) El campo es privado: desde fuera no existe como propiedad');
+  // Escribir luis.#promedio fuera de la clase ni siquiera compila (SyntaxError).
+  console.log(`    luis.promedio -> ${luis.promedio} | Object.keys(luis) -> [${Object.keys(luis).join(', ')}]`);
+}
+
 function main() {
   console.log('=== OBJETOS (CLASES E INSTANCIAS) EN JAVASCRIPT ===');
   declaracion();
   const estudiantes = inicializacion();
   recorrido(estudiantes);
+  modificacion(estudiantes);
+  recorrido(estudiantes, 'Arreglo después de la modificación');
 }
 
 main();
