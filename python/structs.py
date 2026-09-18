@@ -46,9 +46,36 @@ def declaracion() -> None:
     print(f"  EstudianteRecord (NamedTuple, inmutable) -> {describir_campos(EstudianteRecord)}")
 
 
+# 2. Inicialización
+def inicializacion() -> tuple[list[EstudianteStruct], list[EstudianteRecord]]:
+    """Crea 3 instancias de cada tipo con datos ficticios y las guarda en arreglos."""
+    print("\n2. Inicialización (3 instancias con datos ficticios)")
+    # Los campos se pueden pasar por posición o por nombre.
+    ana = EstudianteStruct("Ana Martínez", 19, 4.2)
+    luis = EstudianteStruct(nombre="Luis Pérez", edad=21, promedio=3.6)
+    sofia = EstudianteStruct("Sofía Gómez", 20, 4.7)
+    estudiantes = [ana, luis, sofia]
+
+    registros = [
+        EstudianteRecord("Ana Martínez", 19, 4.2),
+        EstudianteRecord(nombre="Luis Pérez", edad=21, promedio=3.6),
+        EstudianteRecord("Sofía Gómez", 20, 4.7),
+    ]
+
+    # @dataclass y NamedTuple generan __repr__: al imprimir se ven los datos.
+    print("  a) Structs (@dataclass):")
+    for estudiante in estudiantes:
+        print(f"    {estudiante}")
+    print("  b) Records (NamedTuple):")
+    for registro in registros:
+        print(f"    {registro}")
+    return estudiantes, registros
+
+
 def main() -> None:
     print("=== STRUCT / RECORD EN PYTHON ===")
     declaracion()
+    inicializacion()
 
 
 if __name__ == "__main__":
