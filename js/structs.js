@@ -74,10 +74,35 @@ function inicializacion() {
   return { estudiantes, registros };
 }
 
+// 3. Recorrido
+function imprimirEstudiante(posicion, nombre, edad, promedio) {
+  console.log(`    [${posicion}] ${nombre.padEnd(14)} | edad: ${String(edad).padStart(2)} | promedio: ${promedio.toFixed(1)}`);
+}
+
+function recorrido(estudiantes, registros, titulo = '3. Recorrido del arreglo') {
+  console.log(`\n${titulo}`);
+  console.log('  a) Structs, por índice y accediendo a cada campo por su nombre:');
+  for (let i = 0; i < estudiantes.length; i++) {
+    const estudiante = estudiantes[i];
+    imprimirEstudiante(i, estudiante.nombre, estudiante.edad, estudiante.promedio);
+  }
+
+  console.log('  b) Records, desestructurando los campos del objeto:');
+  registros.forEach(({ nombre, edad, promedio }, i) => imprimirEstudiante(i, nombre, edad, promedio));
+  console.log(`    Acceso con corchetes: registros[0]['nombre'] = '${registros[0]['nombre']}'`);
+
+  let suma = 0;
+  for (const estudiante of estudiantes) {
+    suma += estudiante.promedio;
+  }
+  console.log(`  Promedio del grupo: ${(suma / estudiantes.length).toFixed(2)}`);
+}
+
 function main() {
   console.log('=== STRUCT / RECORD EN JAVASCRIPT ===');
   declaracion();
-  inicializacion();
+  const { estudiantes, registros } = inicializacion();
+  recorrido(estudiantes, registros);
 }
 
 main();
