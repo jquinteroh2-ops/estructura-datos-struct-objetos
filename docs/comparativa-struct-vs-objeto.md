@@ -316,3 +316,25 @@ cambiar el promedio de uno, intentar un promedio inválido y copiar un estudiant
 **Criterio práctico:** si el dato **no tiene reglas propias** y solo se guarda o se transporta,
 un struct (o un record, si no debe cambiar) es suficiente y más simple. Si el dato **tiene reglas
 que proteger o acciones propias**, conviene un objeto.
+
+## 5. Aplicación práctica: inventario adaptado (`inventario-adaptado/`)
+
+El ejercicio de inventario del Protocolo Individual de la Unidad 1 (Java puro, con arreglos
+manuales como tablas y arquitectura hexagonal) se convirtió a **Python**, usando structs, records
+y objetos como los elementos guardados en los arreglos:
+
+| Modelo | Clases del inventario | Se guardan en |
+|---|---|---|
+| **Objeto** (datos + reglas) | `Producto`, `Proveedor`, `Compra`, `Venta` | Tablas de `BaseDatos`; las compras también en el arreglo propio de cada `Proveedor` |
+| **Record** (datos inmutables) | `Cliente`, `DetalleCompra`, `DetalleVenta`, `ItemPedido` | Tabla de clientes; arreglos de detalles de cada compra y venta |
+| **Struct** (datos mutables) | `LineaReporte`, `BaseDatos` | Arreglo del reporte de ventas; `BaseDatos` agrupa las tablas |
+
+Lo que se ve en la ejecución (`python inventario-adaptado/main.py --demo`):
+
+- Un `Producto` (objeto) rechaza una venta que dejaría su stock en negativo.
+- Un `DetalleCompra` (record) lanza `FrozenInstanceError` si se intenta cambiar la cantidad.
+- Cambiar el teléfono de un `Cliente` (record) crea un record nuevo que reemplaza al anterior
+  en el arreglo (`¿mismo objeto? False`).
+- El reporte usa `LineaReporte` (struct mutable) para acumular unidades y totales por producto.
+
+La decisión detallada de cada clase está en [`inventario-adaptado/README.md`](../inventario-adaptado/README.md).
