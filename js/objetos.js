@@ -41,9 +41,26 @@ function declaracion() {
   console.log(`    Métodos públicos: ${metodos.join(', ')}`);
 }
 
+// 2. Inicialización
+/** Crea 3 instancias de Estudiante con `new` y las guarda en un arreglo. */
+function inicializacion() {
+  console.log('\n2. Inicialización (3 instancias guardadas en un arreglo)');
+  const estudiantes = [
+    new Estudiante('Ana Martínez', 19, 4.2),
+    new Estudiante('Luis Pérez', 21, 3.6),
+    new Estudiante('Sofía Gómez', 20, 4.7),
+  ];
+  console.log(`  Se crearon ${estudiantes.length} objetos de tipo ${estudiantes[0].constructor.name}`);
+  console.log(`  ¿estudiantes[0] instanceof Estudiante? ${estudiantes[0] instanceof Estudiante}`);
+  // Al serializar el objeto solo aparecen los campos públicos: #promedio queda oculto.
+  console.log(`  JSON.stringify(estudiantes[0]) -> ${JSON.stringify(estudiantes[0])}`);
+  return estudiantes;
+}
+
 function main() {
   console.log('=== OBJETOS (CLASES E INSTANCIAS) EN JAVASCRIPT ===');
   declaracion();
+  inicializacion();
 }
 
 main();
