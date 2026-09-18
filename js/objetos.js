@@ -57,10 +57,20 @@ function inicializacion() {
   return estudiantes;
 }
 
+// 3. Recorrido
+function recorrido(estudiantes, titulo = '3. Recorrido: mostrarInfo() de cada objeto') {
+  console.log(`\n${titulo}`);
+  // Cada objeto sabe mostrarse a sí mismo: el recorrido solo le envía el mensaje.
+  for (const estudiante of estudiantes) {
+    estudiante.mostrarInfo();
+  }
+}
+
 function main() {
   console.log('=== OBJETOS (CLASES E INSTANCIAS) EN JAVASCRIPT ===');
   declaracion();
-  inicializacion();
+  const estudiantes = inicializacion();
+  recorrido(estudiantes);
 }
 
 main();
