@@ -18,16 +18,30 @@ class Estudiante:
     """Estudiante con nombre, edad y promedio, y los métodos que operan sobre ellos.
 
     El promedio es un atributo privado (__promedio): desde fuera de la clase solo
-    se lee con getPromedio().
+    se lee con getPromedio() y solo se cambia con setPromedio(), que valida que
+    la nota esté en la escala de 0.0 a 5.0.
     """
+
+    PROMEDIO_MINIMO = 0.0
+    PROMEDIO_MAXIMO = 5.0
 
     def __init__(self, nombre: str, edad: int, promedio: float) -> None:
         self.nombre = nombre
         self.edad = edad
-        self.__promedio = promedio
+        self.__promedio = 0.0
+        self.setPromedio(promedio)  # el constructor reutiliza la misma validación
 
     def getPromedio(self) -> float:
         return self.__promedio
+
+    # 4. Modificación
+    def setPromedio(self, nuevo_promedio: float) -> None:
+        if not Estudiante.PROMEDIO_MINIMO <= nuevo_promedio <= Estudiante.PROMEDIO_MAXIMO:
+            raise ValueError(
+                f"promedio inválido ({nuevo_promedio}): debe estar entre "
+                f"{Estudiante.PROMEDIO_MINIMO} y {Estudiante.PROMEDIO_MAXIMO}"
+            )
+        self.__promedio = nuevo_promedio
 
     def mostrarInfo(self) -> None:
         print(f"    {self.nombre:<14} | edad: {self.edad:>2} | promedio: {self.__promedio:.1f}")
@@ -67,11 +81,44 @@ def recorrido(estudiantes: list[Estudiante], titulo: str = "3. Recorrido: mostra
         estudiante.mostrarInfo()
 
 
+# 4. Modificación
+def buscar_por_nombre(estudiantes: list[Estudiante], nombre: str) -> int:
+    """Búsqueda lineal: devuelve la posición del estudiante o -1 si no está."""
+    for i in range(len(estudiantes)):
+        if estudiantes[i].nombre == nombre:
+            return i
+    return -1
+
+
+def modificacion(estudiantes: list[Estudiante]) -> None:
+    nombre, nuevo_promedio = "Luis Pérez", 4.1
+    print(f"\n4. Modificación con setPromedio() (promedio de {nombre} a {nuevo_promedio})")
+    luis = estudiantes[buscar_por_nombre(estudiantes, nombre)]
+    print(f"  Antes:   getPromedio() = {luis.getPromedio()}")
+    luis.setPromedio(nuevo_promedio)
+    print(f"  Después: getPromedio() = {luis.getPromedio()}")
+
+    print("  a) El método valida el dato: setPromedio(7.5) se rechaza")
+    try:
+        luis.setPromedio(7.5)
+    except ValueError as error:
+        print(f"    ValueError: {error}")
+    print(f"    El promedio sigue siendo {luis.getPromedio()}")
+
+    print("  b) El atributo es privado: leer luis.__promedio desde fuera falla")
+    try:
+        print(luis.__promedio)
+    except AttributeError as error:
+        print(f"    AttributeError: {error}")
+
+
 def main() -> None:
     print("=== OBJETOS (CLASES E INSTANCIAS) EN PYTHON ===")
     declaracion()
     estudiantes = inicializacion()
     recorrido(estudiantes)
+    modificacion(estudiantes)
+    recorrido(estudiantes, "Arreglo después de la modificación")
 
 
 if __name__ == "__main__":
