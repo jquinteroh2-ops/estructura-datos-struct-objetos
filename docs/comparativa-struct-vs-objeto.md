@@ -215,3 +215,104 @@ class Estudiante {
 clase responde además a *"¿qué puede hacer un estudiante y qué reglas debe cumplir?"*. La clase
 garantiza que ningún estudiante tenga un promedio fuera de 0.0–5.0, algo que el struct no puede
 asegurar por sí mismo.
+
+## 3. Tabla comparativa: Struct/Record vs Objeto
+
+| Criterio | Struct / Record | Objeto (clase e instancia) |
+|---|---|---|
+| **Definición** | Tipo compuesto que agrupa datos relacionados en campos con nombre. Solo guarda datos. Un *record* es un struct inmutable. | Instancia de una clase: agrupa datos (atributos) **y** comportamiento (métodos), y protege su estado (encapsulamiento). |
+| **Mutabilidad** | Struct: mutable, cualquier parte del programa cambia sus campos directamente. Record: inmutable; para "cambiarlo" se crea una copia con el campo nuevo. | Mutable, pero de forma **controlada**: el estado solo cambia a través de sus métodos (`setPromedio`), que validan el dato. |
+| **Tipado** | En lenguajes estáticos (C, C#, Go, TypeScript) cada campo tiene un tipo fijo que el compilador verifica. En Python los tipos se anotan pero no se verifican al ejecutar; en JavaScript no se declaran. | Mismas reglas del lenguaje para sus atributos; además, sus métodos pueden validar tipos y rangos en tiempo de ejecución (`setPromedio` rechaza `7.5` o `'4.2'`). |
+| **Uso en memoria (stack/heap)** | En C, C# y Go el struct es un **tipo valor**: una variable local vive en el **stack** (o dentro del arreglo u objeto que la contiene) y asignarla **copia todos los campos**. En Python y JavaScript el struct/record también es un objeto del **heap** y las variables guardan referencias. | Vive en el **heap**; las variables guardan una **referencia**. Asignar (`b = a`) no copia el objeto: las dos variables apuntan al mismo. Lo libera el recolector de basura cuando nadie lo referencia. |
+| **Igualdad** | Normalmente **por valor**: dos registros con los mismos datos son iguales (`@dataclass`, `NamedTuple`, `record` de C#). En JS, `===` compara referencias incluso en objetos planos. | **Por identidad**: dos objetos con los mismos datos son distintos, salvo que la clase redefina la igualdad (`__eq__`, `Equals`). |
+| **Comportamiento** | Ninguno propio: las operaciones son funciones externas que reciben el struct. | Métodos propios: el objeto sabe mostrarse (`mostrarInfo`) y cambiarse (`setPromedio`). |
+| **Ejemplo en lenguaje estático** | TypeScript: `interface EstudianteRecord { readonly nombre: string; readonly edad: number; readonly promedio: number; }` · C#: `struct EstudianteStruct { ... }` | TypeScript: `class Estudiante { #promedio: number; setPromedio(p: number): void { ... } }` |
+| **Ejemplo en lenguaje dinámico** | Python: `@dataclass class EstudianteStruct` · JavaScript: `{ nombre, edad, promedio }` | Python: `class Estudiante` con `__promedio` · JavaScript: `class Estudiante` con `#promedio` |
+
+### Ejemplo en un lenguaje estático: TypeScript (`js/tipado-estatico.ts`)
+
+TypeScript se usa **solo en este ejemplo puntual**, para mostrar qué cambia cuando los tipos se
+declaran y se verifican antes de ejecutar. El archivo trae comentadas tres líneas con errores de
+tipo; al quitarles el comentario, VS Code las subraya en rojo sin ejecutar el programa:
+
+```ts
+interface EstudianteRecord {          // record: solo datos, campos de solo lectura
+  readonly nombre: string;
+  readonly edad: number;
+  readonly promedio: number;
+}
+
+const invalido: EstudianteRecord = { nombre: 'Ana Martínez', edad: 'diecinueve', promedio: 4.2 };
+// error TS2322: Type 'string' is not assignable to type 'number'.
+
+registros[1].promedio = 4.1;
+// error TS2540: Cannot assign to 'promedio' because it is a read-only property.
+
+estudiantes[1].setPromedio('4.1');
+// error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+```
+
+En Python y JavaScript esos mismos errores **no se detectan hasta ejecutar** (o no se detectan
+nunca): `EstudianteStruct("Ana Martínez", "diecinueve", 4.2)` se crea sin ningún aviso.
+
+### Stack vs heap con un tipo valor: C# (solo como referencia teórica)
+
+Python y JavaScript no tienen tipos valor definidos por el usuario, así que la diferencia de
+memoria entre struct y objeto se ve mejor en C#, donde `struct` es un tipo valor y `class` un
+tipo referencia:
+
+```csharp
+struct EstudianteStruct { public string Nombre; public int Edad; public double Promedio; }
+class  EstudianteClase  { public string Nombre; public int Edad; public double Promedio; }
+
+var s1 = new EstudianteStruct { Nombre = "Ana", Edad = 19, Promedio = 4.2 };
+var s2 = s1;          // se COPIAN todos los campos (tipo valor, en el stack)
+s2.Promedio = 0.0;    // s1.Promedio sigue siendo 4.2
+
+var o1 = new EstudianteClase { Nombre = "Ana", Edad = 19, Promedio = 4.2 };
+var o2 = o1;          // se copia solo la REFERENCIA (el objeto está en el heap)
+o2.Promedio = 0.0;    // o1.Promedio también pasa a 0.0
+```
+
+En Python y JavaScript ocurre siempre lo segundo, sea struct u objeto; por eso los programas de
+comparativa muestran que `alias = original` comparte el mismo dato y que para copiarlo hay que
+crear uno nuevo explícitamente (`replace(...)` en Python, `{ ...original }` en JavaScript).
+
+## 4. El mismo problema con struct/record y con objeto (`comparativa.py` / `comparativa.js`)
+
+Los dos programas resuelven el mismo problema con el mismo `Estudiante` modelado tres veces
+(struct, record y objeto) en un solo archivo por lenguaje: registrar 3 estudiantes, mostrarlos,
+cambiar el promedio de uno, intentar un promedio inválido y copiar un estudiante.
+
+| Situación | Struct | Record | Objeto |
+|---|---|---|---|
+| Mostrar los datos | Función externa `mostrar_info(est)` | La misma función externa | Método propio `est.mostrarInfo()` |
+| Cambiar el promedio a 4.1 | `est.promedio = 4.1` (directo) | Error al asignar; se crea uno nuevo (`replace` / spread) | `est.setPromedio(4.1)` |
+| Promedio inválido 7.5 | Se acepta sin avisar: dato inconsistente | La copia también lo acepta (habría que validar al construir) | Excepción; el promedio no cambia |
+| Mismos datos, ¿iguales? | Python: sí (por valor) · JS: no (por referencia) | Python: sí · JS: no | No (por identidad) |
+| Tipo incorrecto (`edad = "diecinueve"`) | Se acepta | Se acepta | `setPromedio` rechaza un promedio de tipo texto |
+
+### Ventajas y desventajas
+
+**Struct / Record**
+
+- ✅ Declaración mínima y lectura directa: ideal para agrupar y transportar datos.
+- ✅ Igualdad por valor e impresión automática (en Python, gracias a `@dataclass`/`NamedTuple`).
+- ✅ El record, al ser inmutable, se puede compartir entre partes del programa sin miedo a que
+  alguien lo cambie; es seguro como dato histórico (por ejemplo, el detalle de una venta ya hecha).
+- ❌ No protege sus datos: el struct acepta cualquier valor y la validación queda repartida en
+  cada lugar donde se modifica.
+- ❌ El comportamiento queda en funciones sueltas, separadas de los datos que manipulan.
+
+**Objeto**
+
+- ✅ Encapsula el estado: las reglas (promedio entre 0.0 y 5.0) viven en un solo lugar y siempre
+  se cumplen.
+- ✅ Datos y comportamiento juntos: cada objeto sabe mostrarse y modificarse.
+- ✅ Se puede extender con herencia y polimorfismo.
+- ❌ Más código para el mismo dato (constructor, getters, setters).
+- ❌ La igualdad por identidad obliga a redefinir `__eq__`/`equals` si se quiere comparar por datos.
+
+**Criterio práctico:** si el dato **no tiene reglas propias** y solo se guarda o se transporta,
+un struct (o un record, si no debe cambiar) es suficiente y más simple. Si el dato **tiene reglas
+que proteger o acciones propias**, conviene un objeto.
