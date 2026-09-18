@@ -98,3 +98,56 @@ function crearEstudianteRecord(nombre, edad, promedio) {
 tipados, igualdad por valor e inmutabilidad verificada), mientras que en JavaScript el struct es
 una **convención**: un objeto plano sin métodos, cuya forma la garantiza una factory function y
 cuya inmutabilidad se consigue congelándolo.
+
+## 2. Objetos (clases e instancias)
+
+Una **clase** es el molde que define qué **datos** (atributos) y qué **comportamiento** (métodos)
+tendrán sus objetos. Cada **objeto** o **instancia** es un ejemplar concreto de la clase, con sus
+propios valores. A diferencia de un struct, el objeto **protege su estado**: los datos se cambian
+a través de sus métodos, que pueden validar las reglas del problema.
+
+### Python (`python/objetos.py`)
+
+```python
+class Estudiante:
+    PROMEDIO_MINIMO = 0.0
+    PROMEDIO_MAXIMO = 5.0
+
+    def __init__(self, nombre: str, edad: int, promedio: float) -> None:
+        self.nombre = nombre
+        self.edad = edad
+        self.__promedio = 0.0
+        self.setPromedio(promedio)          # el constructor reutiliza la validación
+
+    def getPromedio(self) -> float:
+        return self.__promedio
+
+    def setPromedio(self, nuevo_promedio: float) -> None:
+        if not Estudiante.PROMEDIO_MINIMO <= nuevo_promedio <= Estudiante.PROMEDIO_MAXIMO:
+            raise ValueError(...)
+        self.__promedio = nuevo_promedio
+
+    def mostrarInfo(self) -> None:
+        print(f"{self.nombre} | edad: {self.edad} | promedio: {self.__promedio:.1f}")
+```
+
+| Actividad | Implementación en Python |
+|---|---|
+| Declaración | `class Estudiante` con constructor `__init__`, atributos `nombre`, `edad`, `__promedio` y los métodos `getPromedio`, `setPromedio`, `mostrarInfo` |
+| Inicialización | `Estudiante("Ana Martínez", 19, 4.2)`; las 3 instancias se guardan en la lista `estudiantes` |
+| Recorrido | `for estudiante in estudiantes: estudiante.mostrarInfo()` — cada objeto se muestra a sí mismo |
+| Modificación | `luis.setPromedio(4.1)`; `setPromedio(7.5)` lanza `ValueError` y el promedio no cambia |
+| Encapsulamiento | `__promedio` (dos guiones bajos) activa el *name mangling*: `luis.__promedio` desde fuera lanza `AttributeError` |
+
+**Notas de Python:**
+
+- `self` es la referencia explícita al objeto actual; en Python se escribe como primer parámetro
+  de cada método.
+- La privacidad en Python es por **convención**: `_atributo` significa "uso interno" y
+  `__atributo` renombra internamente el atributo a `_Estudiante__promedio`. No es una barrera
+  absoluta, pero evita accesos accidentales desde fuera de la clase.
+- Una clase normal **no genera `__repr__`** como `@dataclass`: `print(objeto)` muestra
+  `<__main__.Estudiante object at 0x...>`, es decir, su tipo y su dirección en memoria. Por eso
+  la clase define `mostrarInfo()`.
+- Los nombres `mostrarInfo` y `setPromedio` están en *camelCase* porque así los pide el enunciado;
+  la convención de Python (PEP 8) sería `mostrar_info` y `set_promedio`.

@@ -28,3 +28,9 @@ Desde la raíz del repositorio:
 python python/structs.py         # struct (@dataclass) y record (NamedTuple) en Python
 node js/structs.js               # struct (objeto literal) y record (Object.freeze) en JavaScript
 ```
+
+### Objetos (clases e instancias)
+
+```bash
+python python/objetos.py         # clase Estudiante con mostrarInfo() y setPromedio() en Python
+```
