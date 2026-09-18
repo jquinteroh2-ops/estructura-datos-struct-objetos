@@ -33,4 +33,5 @@ node js/structs.js               # struct (objeto literal) y record (Object.free
 
 ```bash
 python python/objetos.py         # clase Estudiante con mostrarInfo() y setPromedio() en Python
+node js/objetos.js               # clase Estudiante con mostrarInfo() y setPromedio() en JavaScript
 ```

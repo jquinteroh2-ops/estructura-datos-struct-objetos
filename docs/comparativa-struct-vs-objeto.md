@@ -151,3 +151,67 @@ class Estudiante:
   la clase define `mostrarInfo()`.
 - Los nombres `mostrarInfo` y `setPromedio` están en *camelCase* porque así los pide el enunciado;
   la convención de Python (PEP 8) sería `mostrar_info` y `set_promedio`.
+
+### JavaScript (`js/objetos.js`)
+
+```js
+class Estudiante {
+  static PROMEDIO_MINIMO = 0.0;
+  static PROMEDIO_MAXIMO = 5.0;
+  #promedio = 0.0;                       // campo privado (ES2022)
+
+  constructor(nombre, edad, promedio) {
+    this.nombre = nombre;
+    this.edad = edad;
+    this.setPromedio(promedio);
+  }
+
+  getPromedio() { return this.#promedio; }
+
+  setPromedio(nuevoPromedio) {
+    if (typeof nuevoPromedio !== 'number'
+        || nuevoPromedio < Estudiante.PROMEDIO_MINIMO
+        || nuevoPromedio > Estudiante.PROMEDIO_MAXIMO) {
+      throw new RangeError(...);
+    }
+    this.#promedio = nuevoPromedio;
+  }
+
+  mostrarInfo() {
+    console.log(`${this.nombre} | edad: ${this.edad} | promedio: ${this.#promedio.toFixed(1)}`);
+  }
+}
+```
+
+### Diferencias de implementación Python vs JavaScript (objetos)
+
+| Aspecto | Python | JavaScript |
+|---|---|---|
+| Declaración | `class Estudiante:` | `class Estudiante { ... }` |
+| Constructor | `def __init__(self, ...)` | `constructor(...)` |
+| Referencia al objeto actual | `self`, explícito como primer parámetro | `this`, implícito |
+| Crear una instancia | `Estudiante("Ana Martínez", 19, 4.2)` | `new Estudiante('Ana Martínez', 19, 4.2)` (con `new`) |
+| Atributo privado | `__promedio`: privado por convención (*name mangling*) | `#promedio`: privado real, impuesto por el lenguaje |
+| Acceso al privado desde fuera | `luis.__promedio` lanza `AttributeError` en tiempo de ejecución | `luis.#promedio` ni siquiera compila (`SyntaxError`); `luis.promedio` es `undefined` |
+| Constantes de clase | `PROMEDIO_MAXIMO = 5.0` en el cuerpo de la clase | `static PROMEDIO_MAXIMO = 5.0` |
+| Error por dato inválido | `ValueError` | `RangeError` |
+| Validación de tipo | Comparar `str` con `float` ya lanza `TypeError` | Hay que comprobar `typeof`: `'4.5' < 5` convierte el texto a número sin avisar |
+| Ver el tipo del objeto | `type(obj).__name__` | `obj.constructor.name` o `obj instanceof Estudiante` |
+
+### Diferencia entre la clase `Estudiante` y el struct/record
+
+| Criterio | Struct / Record (bloque 1) | Clase `Estudiante` (bloque 2) |
+|---|---|---|
+| Qué contiene | Solo **datos** | **Datos + comportamiento** (métodos) |
+| Mostrar la información | Una función externa lee los campos y los imprime | El propio objeto se muestra: `estudiante.mostrarInfo()` |
+| Cambiar el promedio | Struct: asignación directa `est.promedio = 4.1`, sin control. Record: no se puede; se crea uno nuevo | Solo mediante `setPromedio()`, que valida el rango |
+| Dato inválido (`7.5`) | El struct lo acepta en silencio y queda un estudiante inconsistente | Se rechaza con una excepción y el estado no cambia |
+| Encapsulamiento | Ninguno: todos los campos son públicos | El promedio es privado; solo se accede por `getPromedio()`/`setPromedio()` |
+| Mutabilidad | Struct mutable / record inmutable | Mutable, pero **controlada** por sus métodos |
+| Igualdad | Por valor (`@dataclass`/`NamedTuple` comparan los campos) | Por identidad: dos objetos con los mismos datos son distintos |
+| Cuándo usarlo | Para transportar o agrupar datos sin reglas propias | Cuando los datos tienen reglas que proteger o acciones propias |
+
+**Conclusión del bloque:** el struct/record responde a *"¿qué datos tiene un estudiante?"*; la
+clase responde además a *"¿qué puede hacer un estudiante y qué reglas debe cumplir?"*. La clase
+garantiza que ningún estudiante tenga un promedio fuera de 0.0–5.0, algo que el struct no puede
+asegurar por sí mismo.
