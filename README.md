@@ -35,3 +35,11 @@ node js/structs.js               # struct (objeto literal) y record (Object.free
 python python/objetos.py         # clase Estudiante con mostrarInfo() y setPromedio() en Python
 node js/objetos.js               # clase Estudiante con mostrarInfo() y setPromedio() en JavaScript
 ```
+
+### Comparativa struct/record vs objeto
+
+```bash
+python python/comparativa.py     # el mismo Estudiante como struct, record y objeto en Python
+node js/comparativa.js           # el mismo Estudiante como struct, record y objeto en JavaScript
+node js/tipado-estatico.ts       # ejemplo de tipado estático con TypeScript (Node.js 22.18 o superior)
+```
