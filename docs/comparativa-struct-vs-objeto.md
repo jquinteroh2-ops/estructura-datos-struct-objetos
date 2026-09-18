@@ -49,3 +49,52 @@ tipado sigue siendo dinámico.
 
 **Igualdad por valor:** `@dataclass` genera `__eq__`, así que dos structs con los mismos datos
 son iguales (`==`) aunque sean dos instancias distintas en memoria.
+
+### JavaScript (`js/structs.js`)
+
+JavaScript **no tiene struct nativo**. La forma más cercana es un **objeto literal plano**:
+
+```js
+// "Struct" (mutable): factory function que devuelve un objeto plano
+function crearEstudiante(nombre, edad, promedio) {
+  return { nombre, edad, promedio };
+}
+
+// "Record" (inmutable): el mismo objeto, congelado
+function crearEstudianteRecord(nombre, edad, promedio) {
+  return Object.freeze({ nombre, edad, promedio });
+}
+```
+
+**¿Por qué un objeto literal plano es lo más parecido a un struct en JS?**
+
+- Agrupa datos relacionados en **campos con nombre** (`est.nombre`, `est.promedio`), igual que un struct.
+- **No tiene clase ni métodos propios**: solo hereda de `Object.prototype`, así que es "solo datos".
+- No hay que declarar un tipo antes de usarlo: la forma del objeto existe en el momento de crearlo.
+  Por eso se usa una **factory function**: garantiza que todas las instancias tengan los mismos
+  campos, en el mismo orden, sin repetir el literal en cada creación (hace el papel de la
+  "declaración" del struct).
+- `Object.freeze()` impide agregar, borrar o cambiar campos, lo que lo convierte en un **record**.
+  En modo estricto (`'use strict'`) intentar cambiar un campo lanza `TypeError`; sin modo estricto
+  la asignación se ignora en silencio, sin avisar.
+
+### Diferencias de implementación Python vs JavaScript (struct/record)
+
+| Aspecto | Python | JavaScript |
+|---|---|---|
+| ¿Struct nativo? | Sí, en la librería estándar: `@dataclass` y `NamedTuple` | No; se usa un objeto literal plano `{ ... }` |
+| Declaración del tipo | Clase con campos anotados (`nombre: str`) | No existe; la factory function define la forma del objeto |
+| Tipos de los campos | `str`, `int`, `float` (anotados, no verificados al ejecutar) | `string`, `number`, `number` (no distingue enteros de decimales) |
+| Inicialización | Por posición o por nombre: `EstudianteStruct(nombre="Luis Pérez", ...)` | `crearEstudiante("Luis Pérez", 21, 3.6)` o el literal `{ nombre: ..., ... }` |
+| Mostrar los datos | `print(est)` usa el `__repr__` generado | `JSON.stringify(est)` o `console.log(est)` |
+| Acceso a campos | `est.nombre`; en `NamedTuple` también `reg[0]` | `est.nombre` o `est["nombre"]` |
+| Recorrido con desempaquetado | `for nombre, edad, promedio in registros` (por posición) | `for (const { nombre, edad, promedio } of registros)` (por nombre) |
+| Record inmutable | `NamedTuple` (o `@dataclass(frozen=True)`) | `Object.freeze(objeto)` |
+| Error al modificar un record | `AttributeError: can't set attribute` | `TypeError: Cannot assign to read only property` (solo en modo estricto) |
+| Crear una copia con un campo cambiado | `reg._replace(promedio=4.1)` | `Object.freeze({ ...reg, promedio: 4.1 })` |
+| Igualdad por valor | `==` compara campo por campo (`__eq__` generado) | `===` compara referencias: dos objetos con los mismos datos son distintos |
+
+**Conclusión del bloque:** Python ofrece un struct/record "real" (un tipo declarado, con campos
+tipados, igualdad por valor e inmutabilidad verificada), mientras que en JavaScript el struct es
+una **convención**: un objeto plano sin métodos, cuya forma la garantiza una factory function y
+cuya inmutabilidad se consigue congelándolo.
