@@ -59,10 +59,19 @@ def inicializacion() -> list[Estudiante]:
     return estudiantes
 
 
+# 3. Recorrido
+def recorrido(estudiantes: list[Estudiante], titulo: str = "3. Recorrido: mostrarInfo() de cada objeto") -> None:
+    print(f"\n{titulo}")
+    # Cada objeto sabe mostrarse a sí mismo: el recorrido solo le envía el mensaje.
+    for estudiante in estudiantes:
+        estudiante.mostrarInfo()
+
+
 def main() -> None:
     print("=== OBJETOS (CLASES E INSTANCIAS) EN PYTHON ===")
     declaracion()
-    inicializacion()
+    estudiantes = inicializacion()
+    recorrido(estudiantes)
 
 
 if __name__ == "__main__":
