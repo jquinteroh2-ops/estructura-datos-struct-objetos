@@ -98,11 +98,50 @@ function recorrido(estudiantes, registros, titulo = '3. Recorrido del arreglo') 
   console.log(`  Promedio del grupo: ${(suma / estudiantes.length).toFixed(2)}`);
 }
 
+// 4. Modificación
+/** Búsqueda lineal: devuelve la posición del estudiante o -1 si no está. */
+function buscarPorNombre(arreglo, nombre) {
+  for (let i = 0; i < arreglo.length; i++) {
+    if (arreglo[i].nombre === nombre) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function modificacion(estudiantes, registros) {
+  const nombre = 'Luis Pérez';
+  const nuevoPromedio = 4.1;
+  console.log(`\n4. Modificación (cambiar el promedio de ${nombre} a ${nuevoPromedio})`);
+
+  console.log('  a) Struct (objeto plano, mutable): se asigna el campo directamente');
+  const i = buscarPorNombre(estudiantes, nombre);
+  console.log(`    Antes:   ${JSON.stringify(estudiantes[i])}`);
+  estudiantes[i].promedio = nuevoPromedio;
+  console.log(`    Después: ${JSON.stringify(estudiantes[i])}`);
+
+  console.log('  b) Record (Object.freeze, inmutable): asignar el campo produce un error...');
+  const j = buscarPorNombre(registros, nombre);
+  try {
+    // En modo estricto ('use strict') la asignación lanza TypeError;
+    // sin modo estricto se ignoraría en silencio y el valor no cambiaría.
+    registros[j].promedio = nuevoPromedio;
+  } catch (error) {
+    console.log(`    ${error.name}: ${error.message}`);
+  }
+  console.log('    ...así que se crea un record NUEVO copiando los campos con spread (...) y se guarda en su posición');
+  console.log(`    Antes:   ${JSON.stringify(registros[j])}`);
+  registros[j] = Object.freeze({ ...registros[j], promedio: nuevoPromedio });
+  console.log(`    Después: ${JSON.stringify(registros[j])}`);
+}
+
 function main() {
   console.log('=== STRUCT / RECORD EN JAVASCRIPT ===');
   declaracion();
   const { estudiantes, registros } = inicializacion();
   recorrido(estudiantes, registros);
+  modificacion(estudiantes, registros);
+  recorrido(estudiantes, registros, 'Arreglos después de la modificación');
 }
 
 main();
