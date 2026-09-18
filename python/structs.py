@@ -72,10 +72,34 @@ def inicializacion() -> tuple[list[EstudianteStruct], list[EstudianteRecord]]:
     return estudiantes, registros
 
 
+# 3. Recorrido
+def imprimir_estudiante(posicion: int, nombre: str, edad: int, promedio: float) -> None:
+    print(f"    [{posicion}] {nombre:<14} | edad: {edad:>2} | promedio: {promedio:.1f}")
+
+
+def recorrido(estudiantes: list[EstudianteStruct], registros: list[EstudianteRecord]) -> None:
+    print("\n3. Recorrido del arreglo")
+    print("  a) Structs, por índice y accediendo a cada campo por su nombre:")
+    for i in range(len(estudiantes)):
+        estudiante = estudiantes[i]
+        imprimir_estudiante(i, estudiante.nombre, estudiante.edad, estudiante.promedio)
+
+    print("  b) Records, desempaquetando los campos (un NamedTuple también es una tupla):")
+    for i, (nombre, edad, promedio) in enumerate(registros):
+        imprimir_estudiante(i, nombre, edad, promedio)
+    print(f"     Acceso por posición: registros[0][0] = {registros[0][0]!r}")
+
+    suma = 0.0
+    for estudiante in estudiantes:
+        suma += estudiante.promedio
+    print(f"  Promedio del grupo: {suma / len(estudiantes):.2f}")
+
+
 def main() -> None:
     print("=== STRUCT / RECORD EN PYTHON ===")
     declaracion()
-    inicializacion()
+    estudiantes, registros = inicializacion()
+    recorrido(estudiantes, registros)
 
 
 if __name__ == "__main__":
