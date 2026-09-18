@@ -21,3 +21,9 @@ inventario que usa structs, records y objetos como elementos guardados en arregl
 ## Cómo ejecutar
 
 Desde la raíz del repositorio:
+
+### Struct / Record
+
+```bash
+python python/structs.py         # struct (@dataclass) y record (NamedTuple) en Python
+```
