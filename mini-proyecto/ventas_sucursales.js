@@ -4,7 +4,7 @@
  * Arreglo de OBJETOS en el que cada objeto tiene un campo que es a su vez una
  * MATRIZ: cada Producto guarda las unidades vendidas en una matriz ventas[mes][sucursal].
  * La misma solución está en mini-proyecto/ventas_sucursales.py para comparar la
- * sintaxis y el paradigma de Python y JavaScript (la salida es idéntica).
+ * sintaxis y el paradigma de Python y JavaScript (la salida es la misma).
  *
  * Ejecución:
  *   node mini-proyecto/ventas_sucursales.js

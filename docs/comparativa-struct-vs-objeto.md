@@ -338,3 +338,32 @@ Lo que se ve en la ejecución (`python inventario-adaptado/main.py --demo`):
 - El reporte usa `LineaReporte` (struct mutable) para acumular unidades y totales por producto.
 
 La decisión detallada de cada clase está en [`inventario-adaptado/README.md`](../inventario-adaptado/README.md).
+
+## 6. Mini-proyecto integrador (`mini-proyecto/`)
+
+Un **arreglo de objetos** `Producto` en el que cada objeto tiene un campo `ventas` que es a su vez
+una **matriz** de 4 meses × 3 sucursales (Centro, Bocagrande, Manga). Se registran ventas en
+celdas, se suman filas (total por mes) y columnas (total por sucursal), se busca el mejor mes y el
+producto más vendido, y se arma una matriz consolidada sumando las matrices de todos los objetos.
+Las dos versiones producen la misma salida.
+
+### Diferencias de sintaxis y de paradigma
+
+| Aspecto | Python (`ventas_sucursales.py`) | JavaScript (`ventas_sucursales.js`) |
+|---|---|---|
+| Crear la matriz de ceros | `[[0] * 3 for _ in range(4)]` (comprensión de listas) | `Array.from({ length: 4 }, () => new Array(3).fill(0))` |
+| Error típico al crearla | `[[0] * 3] * 4` repite la **misma** fila 4 veces | `new Array(4).fill(new Array(3).fill(0))` repite la **misma** fila 4 veces |
+| Arreglo de objetos de tamaño fijo | `[None] * n` | `new Array(n).fill(null)` |
+| Acceso a una celda | `producto.ventas[mes][sucursal]` | `producto.ventas[mes][sucursal]` (igual) |
+| Sumar una fila | `sum(fila)` (función incorporada) | `fila.reduce((suma, v) => suma + v, 0)` (estilo funcional) |
+| Desempaquetar datos | `codigo, nombre, precio, unidades = DATOS[i]` | `const [codigo, nombre, precio, unidades] = DATOS[i];` |
+| Nombres de métodos | `snake_case`: `registrar_venta`, `total_por_mes` | `camelCase`: `registrarVenta`, `totalPorMes` |
+| Índice fuera de rango | Leer `ventas[4]` lanza `IndexError` | Leer `ventas[4]` devuelve `undefined` sin error; por eso el método valida y lanza `RangeError` |
+| Formato de moneda | `f"${valor:,}".replace(",", ".")` | `valor.toLocaleString('es-CO')` |
+| Alinear texto | `texto.rjust(12)`, `f"{texto:<9}"` | `texto.padStart(12)`, `texto.padEnd(9)` |
+
+**Paradigma:** los dos lenguajes son multiparadigma. En los dos, el `Producto` es un objeto con
+estado (la matriz) y métodos que lo recorren con bucles clásicos (estilo imperativo). Python tiende
+a usar funciones incorporadas (`sum`, `len`) y comprensiones de listas; JavaScript usa más los
+métodos de los arreglos con funciones flecha (`map`, `reduce`, `Array.from`), un estilo más
+funcional.

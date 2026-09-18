@@ -50,3 +50,10 @@ node js/tipado-estatico.ts       # ejemplo de tipado estático con TypeScript (N
 python inventario-adaptado/main.py --demo    # demostración automática, sin escribir nada
 python inventario-adaptado/main.py           # menú interactivo con datos de ejemplo
 ```
+
+### Mini-proyecto integrador
+
+```bash
+python mini-proyecto/ventas_sucursales.py    # arreglo de objetos con una matriz de ventas (Python)
+node mini-proyecto/ventas_sucursales.js      # la misma solución en JavaScript
+```
